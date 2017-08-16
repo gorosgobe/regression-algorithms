@@ -12,6 +12,10 @@ public class StatisticUtils {
         return Math.abs(d1 - d2) <= EPSILON;
     }
 
+    public static boolean isApproxEqual(double d1, double d2, double epsilon) {
+        return Math.abs(d1 - d2) <= epsilon;
+    }
+
     public static double mean(List<Double> list) {
 
         double sum = list.stream().reduce(0.0, (a, b) -> a + b);

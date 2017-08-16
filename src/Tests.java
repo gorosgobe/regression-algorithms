@@ -1,5 +1,6 @@
 import Utils.StatisticUtils;
 import Utils.Point;
+import linearRegression.SimpleLinearRegression;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,6 +32,20 @@ public class Tests {
         List<Point> points = Arrays.asList(new Point(1, 1), new Point(2, 3), new Point(4, 3),
                 new Point(3, 2), new Point(5, 5));
         Assert.assertTrue(StatisticUtils.isApproxEqual(StatisticUtils.covariance(points), 8.0));
+    }
+
+    @Test
+    public void simpleLinearRegressionTest() {
+        List<Point> points = Arrays.asList(new Point(1, 1), new Point(2, 3), new Point(4, 3),
+                new Point(3, 2), new Point(5, 5));
+        SimpleLinearRegression regression = new SimpleLinearRegression(points);
+
+        System.out.println(regression.getRootMeanSquareError());
+        Assert.assertTrue(StatisticUtils.isApproxEqual(regression.getRootMeanSquareError(), 0.6928, 0.0001));
+        Assert.assertTrue(StatisticUtils.isApproxEqual(regression.getInterceptCoefficient(), 0.4));
+        Assert.assertTrue(StatisticUtils.isApproxEqual(regression.getSlopeCoefficient(), 0.8));
+
+
     }
 
 }

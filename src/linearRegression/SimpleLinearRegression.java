@@ -34,7 +34,7 @@ public class SimpleLinearRegression {
 
         double meanSquareError =
                 points.stream()
-                .map(i -> Math.pow(getPrediction(i.getX()), 2.0))
+                .map(i -> Math.pow(getPrediction(i.getX()) - i.getY(), 2.0))
                 .reduce(0.0, (a, b) -> a + b) / points.size();
 
         return Math.sqrt(meanSquareError);
