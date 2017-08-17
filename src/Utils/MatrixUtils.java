@@ -81,8 +81,6 @@ public class MatrixUtils {
             }
         }
 
-
-
         //selects right part of working matrix
         double[][] result = new double[matrix.length][matrix[0].length];
 

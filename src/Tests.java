@@ -201,11 +201,7 @@ public class Tests {
                 {2.2727, -0.1429, -2.202, 0.7273, 0.3449}
         };
 
-        System.out.println("hello");
-        MatrixUtils.printMatrix(MatrixUtils.inverse(matrix4));
         Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(inverse4, MatrixUtils.inverse(matrix4), 0.001));
-
-
     }
 
 }
