@@ -51,9 +51,13 @@ public class MatrixUtils {
         //converts matrix in upper triangular with 1s in diagonal
         for (int i = 0; i < matrix.length; i++) {
             for (int j = i + 1; j < matrix.length; j++) {
-                workingMatrix = subtractRows(workingMatrix, j, i, matrix[j][i] / matrix[i][i]);
+                workingMatrix = subtractRows(workingMatrix, j, i, workingMatrix[j][i] / workingMatrix[i][i]);
             }
         }
+        //takes care of last (higher row and column index from matrix) number, and converts it to 1 by
+        // dividing the whole row
+        workingMatrix = multiplyRow(workingMatrix, matrix.length - 1,
+                1 / workingMatrix[matrix.length - 1][matrix.length - 1]);
 
         //selects right part of working matrix
         double[][] result = new double[matrix.length][matrix[0].length];
@@ -86,6 +90,25 @@ public class MatrixUtils {
         }
 
         return result;
+    }
+
+    public static double[][] multiplyRow(double[][] matrix, int row, double factor) {
+        double[][] result = new double[matrix.length][matrix[0].length];
+
+        for (int i = 0; i < matrix.length; i++) {
+            if (i == row) {
+                continue;
+            }
+
+            System.arraycopy(matrix[i], 0, result[i], 0, matrix[0].length);
+        }
+
+        for (int j = 0; j < matrix[0].length; j++) {
+            result[row][j] = matrix[row][j] * factor;
+        }
+
+        return result;
+
     }
 
     public static boolean areMatricesApproximatelyEqual(double[][] matrix1, double[][] matrix2, double epsilon) {

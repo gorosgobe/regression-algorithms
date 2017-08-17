@@ -41,7 +41,6 @@ public class Tests {
                 new Point(3, 2), new Point(5, 5));
         SimpleLinearRegression regression = new SimpleLinearRegression(points);
 
-        System.out.println(regression.getRootMeanSquareError());
         Assert.assertTrue(StatisticUtils.isApproxEqual(regression.getRootMeanSquareError(), 0.6928, 0.0001));
         Assert.assertTrue(StatisticUtils.isApproxEqual(regression.getInterceptCoefficient(), 0.4));
         Assert.assertTrue(StatisticUtils.isApproxEqual(regression.getSlopeCoefficient(), 0.8));
@@ -156,6 +155,18 @@ public class Tests {
         };
 
         Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(intermediateRightResult, MatrixUtils.inverse(matrix1)));
+
+        double[][] matrix2 = new double[][] {
+                {1, 2, 3},
+                {2, 5, 3},
+                {1,  0, 8}
+        };
+
+        double[][] intermediateRightResult2 = new double[][] {
+                {2, -1, 1},
+                {0, -2, 3},
+                {3,  0, 1}
+        };
 
     }
 
