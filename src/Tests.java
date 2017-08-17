@@ -1,12 +1,18 @@
 import Utils.MatrixUtils;
-import Utils.StatisticUtils;
 import Utils.Point;
+import Utils.StatisticUtils;
 import linearRegression.SimpleLinearRegression;
-import org.junit.Assert;
 import org.junit.Test;
+import polynomialRegression.PolynomialRegression;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
+
+import static org.junit.Assert.assertTrue;
 
 
 public class Tests {
@@ -15,8 +21,8 @@ public class Tests {
     public void meanTest() {
         List<Double> list1 = Arrays.asList(1.0, 3.0, 2.0, 4.0, 5.0);
         List<Double> list2 = Arrays.asList(1.0, 3.0, 3.0, 2.0, 5.0);
-        Assert.assertTrue(StatisticUtils.isApproxEqual(StatisticUtils.mean(list1), 3.0));
-        Assert.assertTrue(StatisticUtils.isApproxEqual(StatisticUtils.mean(list2), 2.8));
+        assertTrue(StatisticUtils.isApproxEqual(StatisticUtils.mean(list1), 3.0));
+        assertTrue(StatisticUtils.isApproxEqual(StatisticUtils.mean(list2), 2.8));
 
     }
 
@@ -24,15 +30,15 @@ public class Tests {
     public void varianceTest() {
         List<Double> list1 = Arrays.asList(1.0, 3.0, 2.0, 4.0, 5.0);
         List<Double> list2 = Arrays.asList(1.0, 3.0, 3.0, 2.0, 5.0);
-        Assert.assertTrue(StatisticUtils.isApproxEqual(StatisticUtils.variance(list1), 10.0));
-        Assert.assertTrue(StatisticUtils.isApproxEqual(StatisticUtils.variance(list2), 8.8));
+        assertTrue(StatisticUtils.isApproxEqual(StatisticUtils.variance(list1), 10.0));
+        assertTrue(StatisticUtils.isApproxEqual(StatisticUtils.variance(list2), 8.8));
     }
 
     @Test
     public void covarianceTest() {
         List<Point> points = Arrays.asList(new Point(1, 1), new Point(2, 3), new Point(4, 3),
                 new Point(3, 2), new Point(5, 5));
-        Assert.assertTrue(StatisticUtils.isApproxEqual(StatisticUtils.covariance(points), 8.0));
+        assertTrue(StatisticUtils.isApproxEqual(StatisticUtils.covariance(points), 8.0));
     }
 
     @Test
@@ -41,9 +47,9 @@ public class Tests {
                 new Point(3, 2), new Point(5, 5));
         SimpleLinearRegression regression = new SimpleLinearRegression(points);
 
-        Assert.assertTrue(StatisticUtils.isApproxEqual(regression.getRootMeanSquareError(), 0.6928, 0.0001));
-        Assert.assertTrue(StatisticUtils.isApproxEqual(regression.getInterceptCoefficient(), 0.4));
-        Assert.assertTrue(StatisticUtils.isApproxEqual(regression.getSlopeCoefficient(), 0.8));
+        assertTrue(StatisticUtils.isApproxEqual(regression.getRootMeanSquareError(), 0.6928, 0.0001));
+        assertTrue(StatisticUtils.isApproxEqual(regression.getInterceptCoefficient(), 0.4));
+        assertTrue(StatisticUtils.isApproxEqual(regression.getSlopeCoefficient(), 0.8));
     }
 
     @Test
@@ -65,7 +71,7 @@ public class Tests {
                 {5.0,  -5.0, 8.0}
         };
 
-        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(
+        assertTrue(MatrixUtils.areMatricesApproximatelyEqual(
                         MatrixUtils.multiply(multiplicand, multiplier), result1, 0.00001));
 
     }
@@ -89,8 +95,30 @@ public class Tests {
                 {7.0}
         };
 
-        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(
+        assertTrue(MatrixUtils.areMatricesApproximatelyEqual(
                 MatrixUtils.multiply(multiplicand, multiplier), result1, 0.00001));
+
+        double[][] a = {
+                {5.0, -4.0},
+                {3.0, 1.0},
+                {4.0, 6.0},
+                {7.0, 8.0}
+        };
+
+        double[][] b = {
+                {-1.0, 9.0, 5.0, -3.0},
+                {2.0, -2.0, 10.0, -4.0}
+        };
+
+        double[][] c = {
+                {-13.0, 53.0, -15.0, 1.0},
+                {-1.0, 25.0, 25.0, -13.0},
+                {8.0, 24.0, 80.0, -36.0},
+                {9.0, 47.0, 115.0, -53.0}
+        };
+
+        assertTrue(MatrixUtils.areMatricesApproximatelyEqual(
+                MatrixUtils.multiply(a, b), c, 0.00001));
 
     }
 
@@ -107,7 +135,7 @@ public class Tests {
                 {0, 1, 1}
         };
 
-        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual
+        assertTrue(MatrixUtils.areMatricesApproximatelyEqual
                 (MatrixUtils.transpose(matrix1), result1, 0.0001));
 
         double[][] matrix2 = new double[][] {
@@ -120,7 +148,7 @@ public class Tests {
                 {0.0, -4.0, 7.0}
         };
 
-        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual
+        assertTrue(MatrixUtils.areMatricesApproximatelyEqual
                 (MatrixUtils.transpose(matrix2), result2, 0.0001));
     }
 
@@ -138,7 +166,7 @@ public class Tests {
                 {2, -2, 1}
         };
 
-        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(result1,
+        assertTrue(MatrixUtils.areMatricesApproximatelyEqual(result1,
                 MatrixUtils.subtractRows(matrix1, 0, 1, 1), 0.0001));
     }
 
@@ -155,7 +183,7 @@ public class Tests {
                 {-2, 1}
         };
 
-        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(intermediateRightResult, MatrixUtils.inverse(matrix1)));
+        assertTrue(MatrixUtils.areMatricesApproximatelyEqual(intermediateRightResult, MatrixUtils.inverse(matrix1)));
 
         double[][] matrix2 = new double[][] {
                 {1, 2, 3},
@@ -169,7 +197,7 @@ public class Tests {
                 {5,  -2, -1}
         };
 
-        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(inverse2, MatrixUtils.inverse(matrix2)));
+        assertTrue(MatrixUtils.areMatricesApproximatelyEqual(inverse2, MatrixUtils.inverse(matrix2)));
 
         double[][] matrix3 = new double[][] {
                 {10, 2, 6},
@@ -183,7 +211,7 @@ public class Tests {
                 {0.6325, -0.6265, 0.3976}
         };
 
-        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(inverse3, MatrixUtils.inverse(matrix3), 0.001));
+        assertTrue(MatrixUtils.areMatricesApproximatelyEqual(inverse3, MatrixUtils.inverse(matrix3), 0.001));
 
         double[][] matrix4 = new double[][] {
                 {4.0, 10.0, 5.0, 6.0, 7.0},
@@ -201,7 +229,86 @@ public class Tests {
                 {2.2727, -0.1429, -2.202, 0.7273, 0.3449}
         };
 
-        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(inverse4, MatrixUtils.inverse(matrix4), 0.001));
+        assertTrue(MatrixUtils.areMatricesApproximatelyEqual(inverse4, MatrixUtils.inverse(matrix4), 0.001));
+    }
+
+    @Test
+    public void testInverse() throws Exception {
+        double[][] matrix = new double[][]{{1,2,3},{0,4,5},{1,0,6}};
+        double[][] inverse = MatrixUtils.inverse(matrix);
+        assertTrue(Math.abs(12.0/11.0-inverse[0][0]) < 1e-5);
+        assertTrue(Math.abs(-6.0/11.0-inverse[0][1]) < 1e-5);
+        assertTrue(Math.abs(-1.0/11.0-inverse[0][2]) < 1e-5);
+        assertTrue(Math.abs(5.0/22.0-inverse[1][0]) < 1e-5);
+        assertTrue(Math.abs(3.0/22.0-inverse[1][1]) < 1e-5);
+        assertTrue(Math.abs(-5.0/22.0-inverse[1][2]) < 1e-5);
+        assertTrue(Math.abs(-2.0/11.0-inverse[2][0]) < 1e-5);
+        assertTrue(Math.abs(1.0/11.0-inverse[2][1]) < 1e-5);
+        assertTrue(Math.abs(2.0/11.0-inverse[2][2]) < 1e-5);
+
+    }
+    @Test
+    public void testInverse2() throws Exception {
+        double[][] matrix = new double[][]{{3,9,2},{0,0,0},{-4,-5,1}};
+        double[][] inverse = MatrixUtils.inverse(matrix);
+        for (int i=0;i<3;i++) {
+            for (int j=0;j<3;j++) {
+                assertTrue(notANumber(inverse[i][j]));
+            }
+        }
+    }
+    private boolean notANumber(double value) {
+        return Double.isNaN(value) || Double.isInfinite(value);
+    }
+
+    @Test
+    public void polynomialRegressionTest1() throws FileNotFoundException {
+
+        File file = new File("src/testData1.txt");
+        Scanner sc = new Scanner(file);
+        sc.nextLine(); //ignores first line with comment
+        List<Point> points = new ArrayList<>();
+
+        while (sc.hasNext()) {
+            //assume number of tokens is multiple of 2
+            String x = sc.next();
+            String y = sc.next();
+            points.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
+        }
+
+        PolynomialRegression polynomialRegression = new PolynomialRegression(points, 2);
+        polynomialRegression.computeCoefficients();
+        double[][] coefficients = polynomialRegression.getCoefficients();
+
+        assertTrue(StatisticUtils.isApproxEqual(coefficients[0][0], -1216.143887));
+        assertTrue(StatisticUtils.isApproxEqual(coefficients[1][0],  2.39893));
+        assertTrue(StatisticUtils.isApproxEqual(coefficients[2][0], -0.00045));
+
+    }
+
+    @Test
+    public void polynomialRegressionTest2() throws FileNotFoundException {
+        File file = new File("src/testData2.txt");
+        Scanner sc = new Scanner(file);
+        sc.nextLine(); //ignores first line with comment
+        List<Point> points = new ArrayList<>();
+
+        while (sc.hasNext()) {
+            //assume number of tokens is multiple of 2
+            String x = sc.next();
+            String y = sc.next();
+            points.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
+        }
+
+        PolynomialRegression polynomialRegression = new PolynomialRegression(points, 2);
+        polynomialRegression.computeCoefficients();
+        double[][] coefficients = polynomialRegression.getCoefficients();
+
+        System.out.println(coefficients[0][0]);
+        //coefficient real data has been rounded in the website that supplied the data, hence the big epsilon
+        assertTrue(StatisticUtils.isApproxEqual(coefficients[0][0], 13.6, 0.1));
+        assertTrue(StatisticUtils.isApproxEqual(coefficients[1][0],  54.05, 0.01));
+        assertTrue(StatisticUtils.isApproxEqual(coefficients[2][0], -4.719, 0.01));
     }
 
 }

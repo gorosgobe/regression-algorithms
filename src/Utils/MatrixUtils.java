@@ -68,11 +68,6 @@ public class MatrixUtils {
             workingMatrix = multiplyRow(workingMatrix, i, 1 / workingMatrix[i][i]);
         }
 
-        //takes care of last (higher row and column index from matrix) number, and converts it to 1 by
-        // dividing the whole row
-        workingMatrix = multiplyRow(workingMatrix, matrix.length - 1,
-                1 / workingMatrix[matrix.length - 1][matrix.length - 1]);
-
         //puts the left part of working matrix in RREF (reduced row echelos form)
         //starts by ignoring the first column as that one is already in RREF (matrix inputted was at least 2x2)
         for (int i = 0; i < matrix.length; i++) {

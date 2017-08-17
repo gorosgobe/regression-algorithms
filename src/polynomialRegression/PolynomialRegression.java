@@ -51,7 +51,7 @@ public class PolynomialRegression {
         //fills up the matrix with the points
         for (int i = 0; i < designMatrix.length; i++) {
             for (int j = 1; j < designMatrix[0].length; j++) {
-                designMatrix[i][j] = points.get(i).getX();
+                designMatrix[i][j] = Math.pow(points.get(i).getX(), j);
             }
         }
 

@@ -1,0 +1,11 @@
+//data taken from http://www.statsdirect.com/help/regression_and_correlation/polynomial.htm
+1290 	1182
+1350 	1172
+1470 	1264
+1600 	1493
+1710 	1571
+1840 	1711
+1980 	1804
+2230 	1840
+2400 	1956
+2930 	1954
