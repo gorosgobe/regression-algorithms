@@ -35,6 +35,15 @@ public class MatrixUtils {
 
     public static double[][] inverse(double[][] matrix) {
         assert matrix.length == matrix[0].length : "Matrix has to have nxn entries";
+
+        if (matrix.length == 1) {
+            double[][] result = new double[1][1];
+            result[0][0] = 1 / matrix[0][0];
+            return result;
+        }
+
+        //all inverses dealt with are 2x2 or bigger
+
         //naive and not most efficient method for computing an inverse of a matrix
         double[][] workingMatrix = new double[matrix.length][2 * matrix[0].length];
 
@@ -54,10 +63,25 @@ public class MatrixUtils {
                 workingMatrix = subtractRows(workingMatrix, j, i, workingMatrix[j][i] / workingMatrix[i][i]);
             }
         }
+
+        for (int i = 0; i < matrix.length; i++) {
+            workingMatrix = multiplyRow(workingMatrix, i, 1 / workingMatrix[i][i]);
+        }
+
         //takes care of last (higher row and column index from matrix) number, and converts it to 1 by
         // dividing the whole row
         workingMatrix = multiplyRow(workingMatrix, matrix.length - 1,
                 1 / workingMatrix[matrix.length - 1][matrix.length - 1]);
+
+        //puts the left part of working matrix in RREF (reduced row echelos form)
+        //starts by ignoring the first column as that one is already in RREF (matrix inputted was at least 2x2)
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = i + 1; j < matrix.length; j++) {
+                workingMatrix = subtractRows(workingMatrix, i, j, workingMatrix[i][j]);
+            }
+        }
+
+
 
         //selects right part of working matrix
         double[][] result = new double[matrix.length][matrix[0].length];
