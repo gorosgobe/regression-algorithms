@@ -34,10 +34,37 @@ public class MatrixUtils {
     }
 
     public static double[][] inverse(double[][] matrix) {
+        assert matrix.length == matrix[0].length : "Matrix has to have nxn entries";
         //naive and not most efficient method for computing an inverse of a matrix
         double[][] workingMatrix = new double[matrix.length][2 * matrix[0].length];
 
-        return null;
+        //initialises identity matrix in right part of working matrix
+        for (int i = 0; i < workingMatrix.length; i++) {
+                workingMatrix[i][i + workingMatrix[0].length / 2] = 1;
+        }
+
+        //initialises left part of working matrix to be the given matrix
+        for (int i = 0; i < matrix.length; i++) {
+            System.arraycopy(matrix[i], 0, workingMatrix[i], 0, matrix[0].length);
+        }
+
+        //converts matrix in upper triangular with 1s in diagonal
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = i + 1; j < matrix.length; j++) {
+                workingMatrix = subtractRows(workingMatrix, j, i, matrix[j][i] / matrix[i][i]);
+            }
+        }
+
+        //selects right part of working matrix
+        double[][] result = new double[matrix.length][matrix[0].length];
+
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = workingMatrix[0].length / 2; j < workingMatrix[0].length; j++) {
+                result[i][j - workingMatrix[0].length / 2] = workingMatrix[i][j];
+            }
+        }
+
+        return result;
     }
 
     public static double[][] subtractRows(double[][] matrix, int firstRow, int secondRow, double factor) {
@@ -51,9 +78,7 @@ public class MatrixUtils {
                 continue;
             }
 
-            for (int j = 0; j < matrix[0].length; j++) {
-                result[i][j] = matrix[i][j];
-            }
+            System.arraycopy(matrix[i], 0, result[i], 0, matrix[0].length);
         }
 
         for (int j = 0; j < matrix[0].length; j++) {

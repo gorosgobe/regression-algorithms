@@ -143,4 +143,20 @@ public class Tests {
                 MatrixUtils.subtractRows(matrix1, 0, 1, 1), 0.0001));
     }
 
+    @Test
+    public void matrixIntermediateInverseTest() {
+        double[][] matrix1 = new double[][] {
+                {1, 3},
+                {2, 7}
+        };
+
+        double[][] intermediateRightResult = new double[][] {
+                {1, 0},
+                {-2, 1}
+        };
+
+        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(intermediateRightResult, MatrixUtils.inverse(matrix1)));
+
+    }
+
 }
