@@ -9,7 +9,7 @@ import java.util.List;
 public class PolynomialRegression {
 
     private final List<Point> points;
-    private final int polynomialGrade;
+    private final int polynomialDegree;
     private double[][] coefficients;
 
     /*
@@ -17,20 +17,20 @@ public class PolynomialRegression {
     Polynomial grade is number of columns of matrix
      */
 
-    public PolynomialRegression(List<Point> points, int polynomialGrade) {
+    public PolynomialRegression(List<Point> points, int polynomialDegree) {
         this.points = points;
-        if (polynomialGrade < 1) {
-            throw new IllegalArgumentException("Polynomial grade should be >= 1");
+        if (polynomialDegree < 1) {
+            throw new IllegalArgumentException("Polynomial degree should be >= 1");
         }
-        this.polynomialGrade = polynomialGrade;
+        this.polynomialDegree = polynomialDegree;
     }
 
     public List<Point> getPoints() {
         return points;
     }
 
-    public int getPolynomialGrade() {
-        return polynomialGrade;
+    public int getPolynomialDegree() {
+        return polynomialDegree;
     }
 
     public double[][] getCoefficients() {
@@ -41,7 +41,7 @@ public class PolynomialRegression {
     public double[][] generateDesignMatrix() {
 
         //width is polynomial grade + 1 as column 0 is a column of 1s
-        double[][] designMatrix = new double[points.size()][polynomialGrade + 1];
+        double[][] designMatrix = new double[points.size()][polynomialDegree + 1];
 
         //sets first column to be 1
         for (int i = 0; i < designMatrix.length; i++) {
@@ -92,6 +92,6 @@ public class PolynomialRegression {
 
         return result;
     }
-
+    
 
 }

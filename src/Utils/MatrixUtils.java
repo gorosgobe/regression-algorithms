@@ -43,7 +43,6 @@ public class MatrixUtils {
         }
 
         //all inverses dealt with are 2x2 or bigger
-
         //naive and not most efficient method for computing an inverse of a matrix
         double[][] workingMatrix = new double[matrix.length][2 * matrix[0].length];
 
@@ -68,7 +67,7 @@ public class MatrixUtils {
             workingMatrix = multiplyRow(workingMatrix, i, 1 / workingMatrix[i][i]);
         }
 
-        //puts the left part of working matrix in RREF (reduced row echelos form)
+        //puts the left part of working matrix in RREF (reduced row echelon form)
         //starts by ignoring the first column as that one is already in RREF (matrix inputted was at least 2x2)
         for (int i = 0; i < matrix.length; i++) {
             for (int j = i + 1; j < matrix.length; j++) {
