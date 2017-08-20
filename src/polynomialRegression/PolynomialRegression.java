@@ -10,10 +10,18 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.IntStream;
 
+/**
+ * Class representing a polynomial regression on the supplied training data. Allows efficient multithreaded computation
+ * of optimal polynomial degree for trained data and supplied test data
+ * @author gorosgobe
+ */
 public class PolynomialRegression {
 
+    /** List of points representing the training data*/
     private final List<Point> points;
+    /** Desired polynomial degree for the regression*/
     private final int polynomialDegree;
+    /** Matrix representing the computed coefficients*/
     private double[][] coefficients;
 
     /*
@@ -21,6 +29,11 @@ public class PolynomialRegression {
     Polynomial degree is number of columns of matrix
      */
 
+    /**
+     * Constructor of a polynomial regression.
+     * @param points the training data
+     * @param polynomialDegree the desired degree of the polynomial regression
+     */
     public PolynomialRegression(List<Point> points, int polynomialDegree) {
         this.points = points;
         if (polynomialDegree < 0) {
@@ -29,23 +42,34 @@ public class PolynomialRegression {
         this.polynomialDegree = polynomialDegree;
     }
 
-    public PolynomialRegression(List<Point> points) {
-        this.points = points;
-        this.polynomialDegree = 0;
-    }
-
+    /**
+     * Gets the training data
+     * @return a list containing the training data as Points
+     */
     public List<Point> getPoints() {
         return points;
     }
 
+    /**
+     * Gets the degree of the polynomial regression.
+     * @return the degree of the polynomial regression.
+     */
     public int getPolynomialDegree() {
         return polynomialDegree;
     }
 
+    /**
+     * Gets the coefficients of the polynomial regression. Will return null if the coefficients havent been computed yet.
+     * @return the coefficient matrix.
+     */
     public double[][] getCoefficients() {
         return coefficients;
     }
 
+    /**
+     * Generates the design matrix with the training data.
+     * @return the design matrix of the training data supplied in the constructor.
+     */
     // Matrix with the x of the points
     public double[][] generateDesignMatrix() {
 
@@ -67,6 +91,10 @@ public class PolynomialRegression {
         return designMatrix;
     }
 
+    /**
+     * Generates the response matrix with the training data.
+     * @return the response matrix with the training data.
+     */
     //Matrix with the y of the points
     public double[][] generateResponseMatrix() {
         double[][] responseMatrix = new double[points.size()][1];
@@ -78,6 +106,9 @@ public class PolynomialRegression {
         return responseMatrix;
     }
 
+    /**
+     * Computes the coefficients of the polynomial regression and stores them in the <em>coefficients</em> field.
+     * */
     public void computeCoefficients() {
         double[][] coefficients;
         double[][] designMatrix = generateDesignMatrix();
@@ -97,6 +128,13 @@ public class PolynomialRegression {
         this.coefficients = coefficients;
     }
 
+    /**
+     * Static method that solves by back substitution the equation Rb = QTy, where b is the unknown matrix, R is the upper
+     * triangular matrix from QR decomposition and QT is the transpose of the orthogonal matrix Q from QR decomposition.
+     * @param r the upper triangular matrix multiplying the unknowns
+     * @param qty the matrix obtained by multiplying the transpose of Q and the response matrix
+     * @return the coefficient matrix
+     */
     public static double[][] solveByBackSubstitution(double[][] r, double[][] qty) {
         double[][] result = new double[r[0].length][1];
 
@@ -112,7 +150,11 @@ public class PolynomialRegression {
     }
 
 
-
+    /**
+     * Gets a prediction for the given value when the regression is trained
+     * @param value the value (x) we want to get a prediction for
+     * @return the predicted value for the supplied argument according to the trained model
+     */
     public double getPrediction(double value) {
 
         double result = 0.0;
@@ -124,6 +166,13 @@ public class PolynomialRegression {
         return result;
     }
 
+    /**
+     * Multithreaded implementation of a method based on Root Mean Square Error (RMSE) comparison to obtain the optimal polynomial
+     * degree that minimises the RMSE error, and therefore improves the accuracy of the trained data, given test data.
+     * @param testData the data we want to optimise the regression for
+     * @return the integer representing the optimal degree for the polynomial regression for the trained data
+     * @throws InterruptedException
+     */
     public int getOptimalPolynomialDegreeWithTestData(List<Point> testData) throws InterruptedException {
 
         long startTime = System.nanoTime();
@@ -136,7 +185,7 @@ public class PolynomialRegression {
         final int[] threadPolyDegrees = new int[threadNum];
         //creates an array of root mean squared errors
         final double[] threadRMSE = new double[threadNum];
-        final Integer[] sequence = new Integer[testData.size() - 1];
+        final int[] sequence = new int[testData.size() - 1];
 
         for (int i = 0; i < testData.size() - 1; i++) {
             sequence[i] = i;
@@ -194,8 +243,17 @@ public class PolynomialRegression {
 
     }
 
-    private static List<Integer[]> splitArray(Integer[] items, int maxSubArraySize) {
-        List<Integer[]> result = new ArrayList<>();
+    /**
+     * Splits an array into n smaller arrays containing the supplied size. Used in the distribute function that
+     * gives each thread a number of tasks with a similar combined difficulty, so each thread works approximately
+     * the same as the other ones, and therefore minimising the Thread.join() time.
+     * @param items the integer array with the items to split
+     * @param maxSubArraySize the max size of the subarrays
+     * @return a list with the arrays containing the maxSubArraySize. The last array will contain maxSubArraySize items
+     * or the remaining ones if the <em>items</em> array size was not multiple of maxSubArraySize.
+     */
+    private static List<int[]> splitArray(int[] items, int maxSubArraySize) {
+        List<int[]> result = new ArrayList<>();
 
         if (items == null || items.length == 0) {
             return result;
@@ -206,7 +264,7 @@ public class PolynomialRegression {
         int slicedItems = 0;
         while (slicedItems < items.length) {
             to = from + Math.min(maxSubArraySize, items.length - to);
-            Integer[] slice = Arrays.copyOfRange(items, from, to);
+            int[] slice = Arrays.copyOfRange(items, from, to);
             result.add(slice);
             slicedItems += slice.length;
             from = to;
@@ -215,9 +273,15 @@ public class PolynomialRegression {
         return result;
     }
 
-    private void distribute(Integer[] array, int numThreads) {
+    /**
+     * Distributes the tasks, ordered by ascending difficulty in the supplied int array, by rearranging them so the difficulty
+     * of each thread's work is similar.
+     * @param array the array containing the task ids by order of difficulty.
+     * @param numThreads the number of threads we will be using
+     */
+    private void distribute(int[] array, int numThreads) {
 
-        List<Integer[]> list = splitArray(array, array.length / numThreads);
+        List<int[]> list = splitArray(array, array.length / numThreads);
         int count = 0;
 
         for (int i = 0; i < array.length / numThreads; i++) {
@@ -227,22 +291,13 @@ public class PolynomialRegression {
             }
         }
 
-
-    }
-    public static Integer[] concat(Integer[] first, Integer[] second) {
-        Integer[] result = Arrays.copyOf(first, first.length + second.length);
-        System.arraycopy(second, 0, result, first.length, second.length);
-        return result;
     }
 
-
-    private void swap(int[] array, int i, int j) {
-
-        int temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-    }
-
+    /**
+     * Gets the index of the minimum double in the supplied array.
+     * @param doubles an array of doubles
+     * @return the index of the minimum double in the array
+     */
     private int getIndexOfMinDouble(double[] doubles) {
 
         double current = Double.MAX_VALUE;
@@ -259,6 +314,10 @@ public class PolynomialRegression {
 
     }
 
+    /**
+     * Gets the RSME (Root Mean Square Error) of the training data.
+     * @return the RSME of the training data.
+     */
     public double getTrainingDataRootMeanSquareError() {
         double meanSquareError =
                 points.stream()
@@ -268,6 +327,12 @@ public class PolynomialRegression {
         return Math.sqrt(meanSquareError);
     }
 
+    /**
+     * Gets the RSME (Root Mean Square Error) of the test data. If the model has not been trained, and so coefficients
+     * are null, the method computes the coefficients.
+     * @param testData the test data to compute the RSME from
+     * @return the RSME for the supplied test data
+     */
     public double getTestDataRootMeanSquareError(List<Point> testData) {
         //model must be trained
         if (coefficients == null) {
@@ -282,6 +347,12 @@ public class PolynomialRegression {
         return Math.sqrt(meanSquareError);
     }
 
+    /**
+     * Example used to find the optimal polynomial degree of a made-up function.
+     * @param args the arguments required, in this case none.
+     * @throws FileNotFoundException
+     * @throws InterruptedException
+     */
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
         File file = new File("src/testData2.txt");
         Scanner sc = new Scanner(file);
@@ -309,18 +380,6 @@ public class PolynomialRegression {
             }
             count++;
         }
-//        int count = 0;
-//        while (sc.hasNext()) {
-//            //assume number of tokens is multiple of 2
-//            String x = sc.next();
-//            String y = sc.next();
-//            if (count < 60) {
-//                points.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
-//            } else {
-//                testData.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
-//            }
-//            count++;
-//        }
 
         System.out.println("Points to analyse: " + testData.size());
 
@@ -356,7 +415,7 @@ public class PolynomialRegression {
     //naive inverse and naive normal equations: 129.705
     //qr inverse and naive normal equations: 79.82s
     //with qr decomposition and back substitution: 20.8814s
-    //with qr decomposition, back substitution and distribution amongs threads: 14.1829s
+    //with qr decomposition, back substitution and distribution amongst threads: 14.1829s
 
 
 }
