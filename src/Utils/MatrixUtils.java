@@ -1,10 +1,20 @@
 package Utils;
 
-
+/**
+ * Class representing utils for Matrix operations
+ * @author gorosgobe
+ */
 public class MatrixUtils {
 
+    /**EPSILON constant used for double comparison and equality*/
     public static final double EPSILON = StatisticUtils.EPSILON;
 
+    /**
+     * Multiplies two matrices.
+     * @param matrix1 first matrix
+     * @param matrix2 second matrix
+     * @return the resulting matrix from multiplying the first matrix with the second matrix.
+     */
     public static double[][] multiply(double[][] matrix1, double[][] matrix2) {
         assert matrix1[0].length == matrix2.length : "Dimensions must match";
 
@@ -21,6 +31,11 @@ public class MatrixUtils {
         return result;
     }
 
+    /**
+     * Transposes the given matrix.
+     * @param matrix the matrix to transpose
+     * @return the transposed matrix
+     */
     public static double[][] transpose(double[][] matrix) {
         double[][] transposed = new double[matrix[0].length][matrix.length];
 
@@ -33,6 +48,13 @@ public class MatrixUtils {
         return transposed;
     }
 
+    /**
+     * Inverts the given matrix using the QR decomposition based method. A = QR therefore A-1 = (QR)-1, so A-1 = R-1Q-1
+     * which, given that Q is orthogonal (QT x Q = I, QT = Q-1), gives <em>A-1 = R-1QT</em>. A precondition is that the matrix
+     * is invertible.
+     * @param matrix the matrix to invert
+     * @return the inverted matrix
+     */
     public static double[][] inverse(double[][] matrix) {
         //QRDecomposition based method
         assert matrix.length == matrix[0].length : "Matrix has to have nxn entries";
@@ -61,6 +83,11 @@ public class MatrixUtils {
         return MatrixUtils.multiply(RInverse, QT);
     }
 
+    /**
+     * Helper used by the <em>inverse</em> method. Inverts the upper triangular matrix R from the QR decomposition.
+     * @param matrix the upper triangular matrix to invert
+     * @return the inverted matrix
+     */
     private static double[][] inverseForUpperTriangular(double[][] matrix) {
         assert matrix.length == matrix[0].length : "Matrix has to have nxn entries";
 
@@ -106,9 +133,14 @@ public class MatrixUtils {
         }
 
         return result;
-
     }
 
+    /**
+     * Naive implementation of the inverse of a matrix using the general method based on Gaussian Elimination. A precondition
+     * is that the matrix given is invertible.
+     * @param matrix the matrix to invert
+     * @return the inverted matrix
+     */
     public static double[][] naiveInverse(double[][] matrix) {
         assert matrix.length == matrix[0].length : "Matrix has to have nxn entries";
 
@@ -163,6 +195,15 @@ public class MatrixUtils {
         return result;
     }
 
+    /**
+     * Helper method for the invert functions that subtracts a row multiplied by a factor from another row of the supplied
+     * matrix
+     * @param matrix the matrix to get the rows from
+     * @param firstRow the index of the first row
+     * @param secondRow the index of the second row
+     * @param factor the factor to multiply the second row to
+     * @return the matrix with the row subtraction operation completed
+     */
     public static double[][] subtractRows(double[][] matrix, int firstRow, int secondRow, double factor) {
         assert !(firstRow == secondRow) : "both rows must not be the same";
         double[][] result = new double[matrix.length][matrix[0].length];
@@ -184,6 +225,13 @@ public class MatrixUtils {
         return result;
     }
 
+    /**
+     * Multiplies a row of the supplied matrix by a factor.
+     * @param matrix the matrix to multiply a row of
+     * @param row the index of the row to multiply
+     * @param factor the factor to multiply the row by
+     * @return the matrix with the row multiplied by a factor.
+     */
     public static double[][] multiplyRow(double[][] matrix, int row, double factor) {
         double[][] result = new double[matrix.length][matrix[0].length];
 
@@ -203,6 +251,13 @@ public class MatrixUtils {
 
     }
 
+    /**
+     * Method that compares two matrices to check equality.
+     * @param matrix1 the first matrix
+     * @param matrix2 the second matrix
+     * @param epsilon the epsilon to use for comparison
+     * @return are both matrices equal within the epsilon given?
+     */
     public static boolean areMatricesApproximatelyEqual(double[][] matrix1, double[][] matrix2, double epsilon) {
         assert matrix1.length == matrix2.length && matrix1[0].length == matrix2[0].length : "Dimensions must be equal";
 
@@ -217,10 +272,20 @@ public class MatrixUtils {
         return true;
     }
 
+    /**
+     * Method that compares two matrices using the default StatisticUtils.EPSILON as epsilon
+     * @param matrix1 the first matrix
+     * @param matrix2 the second matrix
+     * @return are both matrices equal within StatisticUtils.EPSILON?
+     */
     public static boolean areMatricesApproximatelyEqual(double[][] matrix1, double[][] matrix2) {
         return areMatricesApproximatelyEqual(matrix1, matrix2, EPSILON);
     }
 
+    /**
+     * Prints the given matrix. Used for debugging
+     * @param matrix the matrix to print
+     */
     public static void printMatrix(double[][] matrix) {
         for (int i = 0; i < matrix.length; i++)  {
             for (int j = 0; j < matrix[0].length; j++) {

@@ -4,12 +4,21 @@ package Utils;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class representing a QR decomposition
+ * @author gorosgobe
+ */
 public class QRDecomposition {
 
+    /** The matrix to decompose*/
     private double[][] matrix;
+    /** The orthogonal matrix from the decomposition*/
     private double[][] Q;
+    /** The upper triangular matrix from the decomposition*/
     private double[][] R;
+    /** A map containing the values used in the Gram-Schmidt algorithm for the orthogonal matrix. Used for memoization*/
     private Map<Integer, double[][]> EMap;
+    /** A map containing the intermediate values used in the Gram-Schmidt algorithm for the orthogonal matrix. Used for memoization*/
     private Map<Integer, double[][]> UMap;
 
     public QRDecomposition(double[][] matrix) {

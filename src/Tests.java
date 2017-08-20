@@ -269,8 +269,6 @@ public class Tests {
         polynomialRegression.computeCoefficients();
         double[][] coefficients = polynomialRegression.getCoefficients();
 
-        System.out.println("Here");
-        System.out.println(coefficients[0][0]);
         assertTrue(StatisticUtils.isApproxEqual(coefficients[0][0], -1216.143887));
         assertTrue(StatisticUtils.isApproxEqual(coefficients[1][0],  2.39893));
         assertTrue(StatisticUtils.isApproxEqual(coefficients[2][0], -0.00045));
@@ -295,7 +293,6 @@ public class Tests {
         polynomialRegression.computeCoefficients();
         double[][] coefficients = polynomialRegression.getCoefficients();
 
-        System.out.println(coefficients[0][0]);
         //coefficient real data has been rounded in the website that supplied the data, hence the big epsilon
         assertTrue(StatisticUtils.isApproxEqual(coefficients[0][0], 13.6, 0.1));
         assertTrue(StatisticUtils.isApproxEqual(coefficients[1][0],  54.05, 0.01));
@@ -350,7 +347,6 @@ public class Tests {
 
         QRDecomposition decomposition = new QRDecomposition(matrix);
 
-        MatrixUtils.printMatrix(decomposition.getQ());
         Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(Q, decomposition.getQ()));
         Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(R, decomposition.getR()));
     }
@@ -370,7 +366,6 @@ public class Tests {
         };
 
         double[][] result = PolynomialRegression.solveByBackSubstitution(R, y);
-        System.out.println(result[2][0]);
         Assert.assertTrue(StatisticUtils.isApproxEqual(result[0][0], 9.0));
         Assert.assertTrue(StatisticUtils.isApproxEqual(result[1][0], -1));
         Assert.assertTrue(StatisticUtils.isApproxEqual(result[2][0], -2));
