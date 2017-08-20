@@ -1,7 +1,9 @@
 import Utils.MatrixUtils;
 import Utils.Point;
+import Utils.QRDecomposition;
 import Utils.StatisticUtils;
 import linearRegression.SimpleLinearRegression;
+import org.junit.Assert;
 import org.junit.Test;
 import polynomialRegression.PolynomialRegression;
 
@@ -247,19 +249,6 @@ public class Tests {
         assertTrue(Math.abs(2.0/11.0-inverse[2][2]) < 1e-5);
 
     }
-    @Test
-    public void testInverse2() throws Exception {
-        double[][] matrix = new double[][]{{3,9,2},{0,0,0},{-4,-5,1}};
-        double[][] inverse = MatrixUtils.inverse(matrix);
-        for (int i=0;i<3;i++) {
-            for (int j=0;j<3;j++) {
-                assertTrue(notANumber(inverse[i][j]));
-            }
-        }
-    }
-    private boolean notANumber(double value) {
-        return Double.isNaN(value) || Double.isInfinite(value);
-    }
 
     @Test
     public void polynomialRegressionTest1() throws FileNotFoundException {
@@ -280,6 +269,8 @@ public class Tests {
         polynomialRegression.computeCoefficients();
         double[][] coefficients = polynomialRegression.getCoefficients();
 
+        System.out.println("Here");
+        System.out.println(coefficients[0][0]);
         assertTrue(StatisticUtils.isApproxEqual(coefficients[0][0], -1216.143887));
         assertTrue(StatisticUtils.isApproxEqual(coefficients[1][0],  2.39893));
         assertTrue(StatisticUtils.isApproxEqual(coefficients[2][0], -0.00045));
@@ -309,6 +300,81 @@ public class Tests {
         assertTrue(StatisticUtils.isApproxEqual(coefficients[0][0], 13.6, 0.1));
         assertTrue(StatisticUtils.isApproxEqual(coefficients[1][0],  54.05, 0.01));
         assertTrue(StatisticUtils.isApproxEqual(coefficients[2][0], -4.719, 0.01));
+    }
+
+    @Test
+    public void QRDecompositionTest() {
+        double[][] matrix = new double[][] {
+                {1, 1, 0},
+                {1, 0, 1},
+                {0,  1, 1}
+        };
+
+        double[][] Q = new double[][] {
+                {1 / Math.sqrt(2), 1 / Math.sqrt(6), -1 / Math.sqrt(3)},
+                {1 / Math.sqrt(2), -1 / Math.sqrt(6), 1 / Math.sqrt(3)},
+                {0,  2 / Math.sqrt(6), 1 / Math.sqrt(3)}
+        };
+
+        double[][] R = new double[][] {
+                {2 / Math.sqrt(2), 1 / Math.sqrt(2), 1 / Math.sqrt(2)},
+                {0, 3 / Math.sqrt(6), 1 / Math.sqrt(6)},
+                {0,  0, 2 / Math.sqrt(3)}
+        };
+
+        QRDecomposition decomposition = new QRDecomposition(matrix);
+
+        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(Q, decomposition.getQ()));
+        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(R, decomposition.getR()));
+    }
+
+    @Test
+    public void QRDecompositionTest2() {
+        double[][] matrix = new double[][] {
+                {12, -51, 4},
+                {6, 167, -68},
+                {-4,  24, -41}
+        };
+
+        double[][] Q = new double[][] {
+                {6/7.0, -69/175.0, -58/175.0},
+                {3/7.0, 158/175.0, 6/175.0},
+                {-2/7.0,  6/35.0, -33/35.0}
+        };
+
+        double[][] R = new double[][] {
+                {14, 21, -14},
+                {0, 175, -70},
+                {0,  0, 35}
+        };
+
+        QRDecomposition decomposition = new QRDecomposition(matrix);
+
+        MatrixUtils.printMatrix(decomposition.getQ());
+        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(Q, decomposition.getQ()));
+        Assert.assertTrue(MatrixUtils.areMatricesApproximatelyEqual(R, decomposition.getR()));
+    }
+
+    @Test
+    public void substitutionTest() {
+        double[][] R = new double[][] {
+                {1, 2, 1},
+                {0, -4, 1},
+                {0,  0, -2}
+        };
+
+        double[][] y = new double[][] {
+                {5},
+                {2},
+                {4}
+        };
+
+        double[][] result = PolynomialRegression.solveByBackSubstitution(R, y);
+        System.out.println(result[2][0]);
+        Assert.assertTrue(StatisticUtils.isApproxEqual(result[0][0], 9.0));
+        Assert.assertTrue(StatisticUtils.isApproxEqual(result[1][0], -1));
+        Assert.assertTrue(StatisticUtils.isApproxEqual(result[2][0], -2));
+
     }
 
 }

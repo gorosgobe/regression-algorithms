@@ -3,6 +3,7 @@ package polynomialRegression;
 
 import Utils.MatrixUtils;
 import Utils.Point;
+import Utils.QRDecomposition;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -83,12 +84,34 @@ public class PolynomialRegression {
         double[][] responseMatrix = generateResponseMatrix();
         double[][] designMatrixTranspose = MatrixUtils.transpose(designMatrix);
 
+
         //coefficient matrix is given by the equation described above
-        coefficients = MatrixUtils.multiply(MatrixUtils.multiply(MatrixUtils.inverse(
-                MatrixUtils.multiply(designMatrixTranspose, designMatrix)), designMatrixTranspose), responseMatrix);
+        //NAIVE AND INEFFICIENT WAY:
+//        coefficients = MatrixUtils.multiply(MatrixUtils.multiply(MatrixUtils.inverse(
+//                MatrixUtils.multiply(designMatrixTranspose, designMatrix)), designMatrixTranspose), responseMatrix);
+
+        //QR DECOMPOSITION AND BACK SUBSTITUTION
+        QRDecomposition decomp = new QRDecomposition(designMatrix);
+        coefficients = solveByBackSubstitution(decomp.getR(), MatrixUtils.multiply(MatrixUtils.transpose(decomp.getQ()), responseMatrix));
 
         this.coefficients = coefficients;
     }
+
+    public static double[][] solveByBackSubstitution(double[][] r, double[][] qty) {
+        double[][] result = new double[r[0].length][1];
+
+        for (int i = r[0].length - 1; i >= 0; i--) {
+            result[i][0] = qty[i][0];
+            for (int j = i + 1; j < r[0].length; j++) {
+                result[i][0] = result[i][0] - (r[i][j] * result[j][0]);
+            }
+            result[i][0] = result[i][0] / r[i][i];
+        }
+
+        return result;
+    }
+
+
 
     public double getPrediction(double value) {
 
@@ -113,6 +136,18 @@ public class PolynomialRegression {
         final int[] threadPolyDegrees = new int[threadNum];
         //creates an array of root mean squared errors
         final double[] threadRMSE = new double[threadNum];
+        final Integer[] sequence = new Integer[testData.size() - 1];
+
+        for (int i = 0; i < testData.size() - 1; i++) {
+            sequence[i] = i;
+        }
+
+        //creates an even distribution of polynomial degrees so each thread does approximately the same amount of work
+        distribute(sequence, threadNum);
+        for (int i : sequence) {
+            System.out.print(i + " ");
+        }
+        System.out.println();
 
         //for every available thread with index: threadIndex
         IntStream.range(0, threadNum).forEach(threadIndex -> {
@@ -121,14 +156,13 @@ public class PolynomialRegression {
                 //with a mapping from RSMErrors to polynomial degrees
                 Map<Double, Integer> errorsToDegree = new LinkedHashMap<>();
 
-                //for the degrees corresponding to the thread index, compute the RSME errors and add it to the map
-                for (int i = ((testData.size() - 1) * threadIndex) / threadNum;
-                     i < (testData.size() - 1) * (threadIndex + 1)/ threadNum; i++) {
+                for (int i = (sequence.length * threadIndex) / threadNum;
+                     i < (sequence.length * (threadIndex + 1)) / threadNum; i++) {
 
-                    PolynomialRegression regression = new PolynomialRegression(getPoints(), i);
+                    PolynomialRegression regression = new PolynomialRegression(getPoints(), sequence[i]);
                     double error = regression.getTestDataRootMeanSquareError(testData);
-                    System.out.println("Degree: " + i + ", Error: " + error);
-                    errorsToDegree.put(error, i);
+                    System.out.println("Thread: " + threadIndex + ", Degree: " +sequence[i] + ", Error: " + error);
+                    errorsToDegree.put(error, sequence[i]);
 
                 }
 
@@ -158,6 +192,55 @@ public class PolynomialRegression {
         System.out.println("Time required: " + ((endTime - startTime) / 1000000000.0) + "s");
         return threadPolyDegrees[minimalDegreeIndex];
 
+    }
+
+    private static List<Integer[]> splitArray(Integer[] items, int maxSubArraySize) {
+        List<Integer[]> result = new ArrayList<>();
+
+        if (items == null || items.length == 0) {
+            return result;
+        }
+
+        int from = 0;
+        int to = 0;
+        int slicedItems = 0;
+        while (slicedItems < items.length) {
+            to = from + Math.min(maxSubArraySize, items.length - to);
+            Integer[] slice = Arrays.copyOfRange(items, from, to);
+            result.add(slice);
+            slicedItems += slice.length;
+            from = to;
+        }
+
+        return result;
+    }
+
+    private void distribute(Integer[] array, int numThreads) {
+
+        List<Integer[]> list = splitArray(array, array.length / numThreads);
+        int count = 0;
+
+        for (int i = 0; i < array.length / numThreads; i++) {
+            for (int j = 0; j < numThreads; j++) {
+                array[count] = list.get(j)[count / numThreads];
+                count++;
+            }
+        }
+
+
+    }
+    public static Integer[] concat(Integer[] first, Integer[] second) {
+        Integer[] result = Arrays.copyOf(first, first.length + second.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
+        return result;
+    }
+
+
+    private void swap(int[] array, int i, int j) {
+
+        int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
     }
 
     private int getIndexOfMinDouble(double[] doubles) {
@@ -207,22 +290,73 @@ public class PolynomialRegression {
         List<Point> testData = new ArrayList<>();
 
         int count = 0;
-        while (sc.hasNext()) {
+        for (double i = -2.0; i < 2.0; i += 0.01) {
             //assume number of tokens is multiple of 2
-            String x = sc.next();
-            String y = sc.next();
-            if (count < 20) {
-                points.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
+
+            Point point = new Point(i, 0.7483924 * Math.pow(i, 7)
+                    + 13.431 * Math.pow(i, 6)
+                    + -12.35161212 * Math.pow(i, 5)
+                    + 0.0000012 * Math.pow(i, 4)
+                    + -9.99991212 * Math.pow(i, 3)
+                    + -34.4300009 * Math.pow(i, 2)
+                    + 0.7483924 * i
+                    + Math.random());
+
+            if (count < 200) {
+                points.add(point);
             } else {
-                testData.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
+                testData.add(point);
             }
             count++;
         }
+//        int count = 0;
+//        while (sc.hasNext()) {
+//            //assume number of tokens is multiple of 2
+//            String x = sc.next();
+//            String y = sc.next();
+//            if (count < 60) {
+//                points.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
+//            } else {
+//                testData.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
+//            }
+//            count++;
+//        }
+
+        System.out.println("Points to analyse: " + testData.size());
 
         PolynomialRegression regression = new PolynomialRegression(points, 0);
         System.out.println(regression.getOptimalPolynomialDegreeWithTestData(testData));
 
     }
+
+
+//    int count = 0;
+//        for (double i = -2.0; i < 2.0; i += 0.01) {
+//        //assume number of tokens is multiple of 2
+//
+//        Point point = new Point(i, 0.7483924 * Math.pow(i, 7)
+//                + 13.431 * Math.pow(i, 6)
+//                + -12.35161212 * Math.pow(i, 5)
+//                + 0.0000012 * Math.pow(i, 4)
+//                + -9.99991212 * Math.pow(i, 3)
+//                + -34.4300009 * Math.pow(i, 2)
+//                + 0.7483924 * i
+//                + Math.random());
+//
+//        if (count < 200) {
+//            points.add(point);
+//        } else {
+//            testData.add(point);
+//        }
+//        count++;
+//    }
+
+    /* EFFICIENCY ANALYSIS WITH DIFFERENT IMPLEMENTATIONS */
+    //with this configuration:
+    //naive inverse and naive normal equations: 129.705
+    //qr inverse and naive normal equations: 79.82s
+    //with qr decomposition and back substitution: 20.8814s
+    //with qr decomposition, back substitution and distribution amongs threads: 14.1829s
 
 
 }

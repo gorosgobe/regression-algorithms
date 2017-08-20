@@ -34,6 +34,82 @@ public class MatrixUtils {
     }
 
     public static double[][] inverse(double[][] matrix) {
+        //QRDecomposition based method
+        assert matrix.length == matrix[0].length : "Matrix has to have nxn entries";
+
+        if (matrix.length == 1) {
+            double[][] result = new double[1][1];
+            result[0][0] = 1 / matrix[0][0];
+            return result;
+        }
+
+        //all inverses dealt with are 2x2 or bigger
+        QRDecomposition decomposition = new QRDecomposition(matrix);
+
+        double[][] R = decomposition.getR();
+
+        //corrects numbers due to numerical stability, setting the lower part to zero
+        for (int i = 1; i < R.length; i++) {
+            for (int j = 0; j < i; j++) {
+                    R[i][j] = 0;
+            }
+        }
+
+        double[][] QT = MatrixUtils.transpose(decomposition.getQ());
+        double[][] RInverse = inverseForUpperTriangular(R);
+
+        return MatrixUtils.multiply(RInverse, QT);
+    }
+
+    private static double[][] inverseForUpperTriangular(double[][] matrix) {
+        assert matrix.length == matrix[0].length : "Matrix has to have nxn entries";
+
+        double[][] workingMatrix = new double[matrix.length][2 * matrix[0].length];
+
+        //initialises identity matrix in right part of working matrix
+        for (int i = 0; i < workingMatrix.length; i++) {
+            workingMatrix[i][i + workingMatrix[0].length / 2] = 1;
+        }
+
+        //initialises left part of working matrix to be the given matrix
+        for (int i = 0; i < matrix.length; i++) {
+            System.arraycopy(matrix[i], 0, workingMatrix[i], 0, matrix[0].length);
+        }
+
+        //creates ones in the diagonal
+        for (int i = 0; i < matrix.length; i++) {
+            workingMatrix = multiplyRow(workingMatrix, i, 1 / workingMatrix[i][i]);
+        }
+
+        //corrects numbers due to numerical stability, setting the lower part to zero
+        for (int i = 1; i < workingMatrix.length; i++) {
+            for (int j = 0; j < i; j++) {
+                    workingMatrix[i][j] = 0;
+            }
+        }
+
+        //puts the left part of working matrix in RREF (reduced row echelon form)
+        //starts by ignoring the first column as that one is already in RREF (matrix inputted was at least 2x2)
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = i + 1; j < matrix.length; j++) {
+                workingMatrix = subtractRows(workingMatrix, i, j, workingMatrix[i][j]);
+            }
+        }
+
+        //selects right part of working matrix
+        double[][] result = new double[matrix.length][matrix[0].length];
+
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = workingMatrix[0].length / 2; j < workingMatrix[0].length; j++) {
+                result[i][j - workingMatrix[0].length / 2] = workingMatrix[i][j];
+            }
+        }
+
+        return result;
+
+    }
+
+    public static double[][] naiveInverse(double[][] matrix) {
         assert matrix.length == matrix[0].length : "Matrix has to have nxn entries";
 
         if (matrix.length == 1) {
