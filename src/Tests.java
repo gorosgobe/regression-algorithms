@@ -1,7 +1,5 @@
-import Utils.MatrixUtils;
-import Utils.Point;
-import Utils.QRDecomposition;
-import Utils.StatisticUtils;
+import Utils.*;
+import linearRegression.MultipleLinearRegression;
 import linearRegression.SimpleLinearRegression;
 import org.junit.Assert;
 import org.junit.Test;
@@ -369,6 +367,66 @@ public class Tests {
         Assert.assertTrue(StatisticUtils.isApproxEqual(result[0][0], 9.0));
         Assert.assertTrue(StatisticUtils.isApproxEqual(result[1][0], -1));
         Assert.assertTrue(StatisticUtils.isApproxEqual(result[2][0], -2));
+
+
+    }
+
+    @Test
+    public void multipleLinearRegressionTest() throws FileNotFoundException {
+        File file = new File("src/testData3.txt");
+        Scanner sc = new Scanner(file);
+        sc.nextLine(); //ignores first line with comment
+        List<MultiplePoint> points = new ArrayList<>();
+
+        while (sc.hasNext()) {
+            //assume number of tokens is multiple of 3
+            String y = sc.next();
+            String x1 = sc.next();
+            String x2 = sc.next();
+            List<Double> list = new ArrayList<>();
+            list.add(Double.parseDouble(x1));
+            list.add(Double.parseDouble(x2));
+            points.add(new MultiplePoint(list, Double.parseDouble(y)));
+        }
+
+        MultipleLinearRegression mlr = new MultipleLinearRegression(points);
+        double[][] coeffs = mlr.getCoefficients();
+
+        //coefficient real data has been rounded in the website that supplied the data, hence the big epsilons
+        Assert.assertTrue(StatisticUtils.isApproxEqual(coeffs[0][0], 86.0, 0.1));
+        Assert.assertTrue(StatisticUtils.isApproxEqual(coeffs[1][0], -5.33, 0.001));
+        Assert.assertTrue(StatisticUtils.isApproxEqual(coeffs[2][0], 31.10, 0.01));
+        Assert.assertTrue(StatisticUtils.isApproxEqual(mlr.getPrediction(2, 5), 230.84, 0.1));
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void multipleLinearRegressionTest2() throws FileNotFoundException {
+        File file = new File("src/testData3.txt");
+        Scanner sc = new Scanner(file);
+        sc.nextLine(); //ignores first line with comment
+        List<MultiplePoint> points = new ArrayList<>();
+        int count = 0;
+        while (sc.hasNext()) {
+            String x1 = null;
+            //assume number of tokens is multiple of 3
+            String y = sc.next();
+            if (count != 2) {
+                x1 = sc.next();
+            } else {
+                sc.next();
+            }
+            String x2 = sc.next();
+            List<Double> list = new ArrayList<>();
+            if (count != 2) {
+                list.add(Double.parseDouble(x1));
+            }
+            list.add(Double.parseDouble(x2));
+            points.add(new MultiplePoint(list, Double.parseDouble(y)));
+            count++;
+        }
+
+        MultipleLinearRegression mlr = new MultipleLinearRegression(points);
 
     }
 

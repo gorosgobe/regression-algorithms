@@ -113,7 +113,6 @@ public class PolynomialRegression {
         double[][] coefficients;
         double[][] designMatrix = generateDesignMatrix();
         double[][] responseMatrix = generateResponseMatrix();
-        double[][] designMatrixTranspose = MatrixUtils.transpose(designMatrix);
 
 
         //coefficient matrix is given by the equation described above
