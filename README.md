@@ -51,7 +51,7 @@ List<MultiplePoint> list = mlr.getPoints();
 //get a prediction for the given independent variables
 double prediction = mlr.getPrediction(1.3, 2.78);
 double[] values = new double[] {1.3, 2.78};
-double prediction2 = mlr.getPrecition(values);
+double prediction2 = mlr.getPrediction(values);
 ```
 
 - Simple polynomial regression
