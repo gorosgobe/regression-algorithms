@@ -42,6 +42,25 @@ public class PolynomialRegression {
             throw new IllegalArgumentException("Polynomial degree should be >= 0");
         }
         this.polynomialDegree = polynomialDegree;
+        computeCoefficients();
+    }
+
+    /**
+     * Constructor of a polynomial regression.
+     * @param points the training data
+     * @param polynomialDegree the desired degree of the polynomial regression
+     * @param computeCoeff should coefficients be computed
+     */
+    private PolynomialRegression(List<Point> points, int polynomialDegree, boolean computeCoeff) {
+        this.points = points;
+        if (polynomialDegree < 0) {
+            throw new IllegalArgumentException("Polynomial degree should be >= 0");
+        }
+
+        this.polynomialDegree = polynomialDegree;
+        if (computeCoeff) {
+          computeCoefficients();
+        }
     }
 
     /**
@@ -155,7 +174,7 @@ public class PolynomialRegression {
      * @return the integer representing the optimal degree for the polynomial regression for the trained data
      * @throws InterruptedException
      */
-    public int getOptimalPolynomialDegreeWithTestData(List<Point> testData, boolean terminalOutput)
+    public static int getOptimalPolynomialDegreeWithTestData(List<Point> trainingData, List<Point> testData, boolean terminalOutput)
             throws InterruptedException {
 
         long startTime = System.nanoTime();
@@ -187,7 +206,7 @@ public class PolynomialRegression {
                 for (int i = (sequence.length * threadIndex) / threadNum;
                      i < (sequence.length * (threadIndex + 1)) / threadNum; i++) {
 
-                    PolynomialRegression regression = new PolynomialRegression(getPoints(), sequence[i]);
+                    PolynomialRegression regression = new PolynomialRegression(trainingData, sequence[i], true);
                     double error = regression.getTestDataRootMeanSquareError(testData);
                     if (terminalOutput) {
                         System.out.println("Thread: " + threadIndex + ", Degree: " +sequence[i] + ", Error: " + error);
@@ -227,6 +246,18 @@ public class PolynomialRegression {
     }
 
     /**
+     * Multithreaded implementation of a method based on Root Mean Square Error (RMSE) comparison to obtain the optimal polynomial
+     * degree that minimises the RMSE error, and therefore improves the accuracy of the trained data, given test data.
+     * By default, it prints to terminal the errors, polynomial degrees, the thread ids and the elapsed time.
+     * @param testData the data we want to optimise the regression for
+     * @return the integer representing the optimal degree for the polynomial regression for the trained data
+     * @throws InterruptedException
+     */
+    public int getOptimalPolynomialDegreeWithTestData(List<Point> trainingData, List<Point> testData) throws InterruptedException {
+        return getOptimalPolynomialDegreeWithTestData(trainingData, testData, true);
+    }
+
+    /**
      * Returns the optimal polynomial regression (with minimised RMSE) for the supplied training data and test data. Also
      * prints the errors, poly-degrees and time elapsed in the computation. This also includes the thread ids, as this is
      * a multithreaded implementation. Bear in mind, however, that this method is computationally intensive should a lot
@@ -241,20 +272,8 @@ public class PolynomialRegression {
     public PolynomialRegression getOptimalPolynomialRegression(List<Point> trainingData, List<Point> testData,
                                                                boolean terminalOutput) throws InterruptedException {
         PolynomialRegression plr = new PolynomialRegression(trainingData, 0);
-        int optimalDegree = getOptimalPolynomialDegreeWithTestData(testData, terminalOutput);
+        int optimalDegree = getOptimalPolynomialDegreeWithTestData(trainingData, testData, terminalOutput);
         return new PolynomialRegression(trainingData, optimalDegree);
-    }
-
-    /**
-     * Multithreaded implementation of a method based on Root Mean Square Error (RMSE) comparison to obtain the optimal polynomial
-     * degree that minimises the RMSE error, and therefore improves the accuracy of the trained data, given test data.
-     * By default, it prints to terminal the errors, polynomial degrees, the thread ids and the elapsed time.
-     * @param testData the data we want to optimise the regression for
-     * @return the integer representing the optimal degree for the polynomial regression for the trained data
-     * @throws InterruptedException
-     */
-    public int getOptimalPolynomialDegreeWithTestData(List<Point> testData) throws InterruptedException {
-        return getOptimalPolynomialDegreeWithTestData(testData, true);
     }
 
     /**
@@ -293,7 +312,7 @@ public class PolynomialRegression {
      * @param array the array containing the task ids by order of difficulty.
      * @param numThreads the number of threads we will be using
      */
-    private void distribute(int[] array, int numThreads) {
+    private static void distribute(int[] array, int numThreads) {
 
         List<int[]> list = splitArray(array, array.length / numThreads);
         int count = 0;
@@ -312,7 +331,7 @@ public class PolynomialRegression {
      * @param doubles an array of doubles
      * @return the index of the minimum double in the array
      */
-    private int getIndexOfMinDouble(double[] doubles) {
+    private static int getIndexOfMinDouble(double[] doubles) {
 
         double current = Double.MAX_VALUE;
         int currentIndex = 0;
@@ -387,7 +406,7 @@ public class PolynomialRegression {
                     + 0.7483924 * i
                     + Math.random());
 
-            if (count < 200) {
+            if (count < 205) {
                 points.add(point);
             } else {
                 testData.add(point);
@@ -398,7 +417,7 @@ public class PolynomialRegression {
         System.out.println("Points to analyse: " + testData.size());
 
         PolynomialRegression regression = new PolynomialRegression(points, 0);
-        System.out.println(regression.getOptimalPolynomialDegreeWithTestData(testData));
+        System.out.println(regression.getOptimalPolynomialDegreeWithTestData(points, testData));
 
     }
 

@@ -265,7 +265,7 @@ public class Tests {
         }
 
         PolynomialRegression polynomialRegression = new PolynomialRegression(points, 2);
-        polynomialRegression.computeCoefficients();
+        //polynomialRegression.computeCoefficients();
         double[][] coefficients = polynomialRegression.getCoefficients();
 
         assertTrue(StatisticUtils.isApproxEqual(coefficients[0][0], -1216.143887));
@@ -289,7 +289,7 @@ public class Tests {
         }
 
         PolynomialRegression polynomialRegression = new PolynomialRegression(points, 2);
-        polynomialRegression.computeCoefficients();
+        //polynomialRegression.computeCoefficients();
         double[][] coefficients = polynomialRegression.getCoefficients();
 
         //coefficient real data has been rounded in the website that supplied the data, hence the big epsilon
