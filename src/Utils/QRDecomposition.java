@@ -277,6 +277,27 @@ public class QRDecomposition {
     }
 
     /**
+     * Static method that solves by back substitution the equation Rb = QTy, where b is the unknown matrix, R is the upper
+     * triangular matrix from QR decomposition and QT is the transpose of the orthogonal matrix Q from QR decomposition.
+     * @param r the upper triangular matrix multiplying the unknowns
+     * @param qty the matrix obtained by multiplying the transpose of Q and the response matrix
+     * @return the coefficient matrix
+     */
+    public static double[][] solveByBackSubstitution(double[][] r, double[][] qty) {
+        double[][] result = new double[r[0].length][1];
+
+        for (int i = r[0].length - 1; i >= 0; i--) {
+            result[i][0] = qty[i][0];
+            for (int j = i + 1; j < r[0].length; j++) {
+                result[i][0] = result[i][0] - (r[i][j] * result[j][0]);
+            }
+            result[i][0] = result[i][0] / r[i][i];
+        }
+
+        return result;
+    }
+
+    /**
      * Put the value given by the dot product of the column of the original matrix and the column of the Q matrix
      * (eVector) at the specified indices
      * @param value the value given by the dot product of the column of the original matrix and the column of the Q matrix

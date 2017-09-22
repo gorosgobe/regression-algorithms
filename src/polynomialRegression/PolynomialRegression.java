@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.IntStream;
 
+import static Utils.QRDecomposition.solveByBackSubstitution;
+
 /**
  * Class representing a polynomial regression on the supplied training data. Allows efficient multithreaded computation
  * of optimal polynomial degree for trained data and supplied test data
@@ -71,7 +73,7 @@ public class PolynomialRegression {
      * @return the design matrix of the training data supplied in the constructor.
      */
     // Matrix with the x of the points
-    public double[][] generateDesignMatrix() {
+    private double[][] generateDesignMatrix() {
 
         //width is polynomial grade + 1 as column 0 is a column of 1s
         double[][] designMatrix = new double[points.size()][polynomialDegree + 1];
@@ -96,7 +98,7 @@ public class PolynomialRegression {
      * @return the response matrix with the training data.
      */
     //Matrix with the y of the points
-    public double[][] generateResponseMatrix() {
+    private double[][] generateResponseMatrix() {
         double[][] responseMatrix = new double[points.size()][1];
 
         for (int i = 0; i < responseMatrix.length; i++) {
@@ -127,34 +129,13 @@ public class PolynomialRegression {
         this.coefficients = coefficients;
     }
 
-    /**
-     * Static method that solves by back substitution the equation Rb = QTy, where b is the unknown matrix, R is the upper
-     * triangular matrix from QR decomposition and QT is the transpose of the orthogonal matrix Q from QR decomposition.
-     * @param r the upper triangular matrix multiplying the unknowns
-     * @param qty the matrix obtained by multiplying the transpose of Q and the response matrix
-     * @return the coefficient matrix
-     */
-    public static double[][] solveByBackSubstitution(double[][] r, double[][] qty) {
-        double[][] result = new double[r[0].length][1];
-
-        for (int i = r[0].length - 1; i >= 0; i--) {
-            result[i][0] = qty[i][0];
-            for (int j = i + 1; j < r[0].length; j++) {
-                result[i][0] = result[i][0] - (r[i][j] * result[j][0]);
-            }
-            result[i][0] = result[i][0] / r[i][i];
-        }
-
-        return result;
-    }
-
 
     /**
      * Gets a prediction for the given value when the regression is trained
      * @param value the value (x) we want to get a prediction for
      * @return the predicted value for the supplied argument according to the trained model
      */
-    public double getPrediction(double value) {
+    private double getPrediction(double value) {
 
         double result = 0.0;
 
@@ -169,10 +150,13 @@ public class PolynomialRegression {
      * Multithreaded implementation of a method based on Root Mean Square Error (RMSE) comparison to obtain the optimal polynomial
      * degree that minimises the RMSE error, and therefore improves the accuracy of the trained data, given test data.
      * @param testData the data we want to optimise the regression for
+     * @param terminalOutput do you want the thread ids, errors, polynomial degrees and elapsed times to be outputted to
+     *                       the standard output?
      * @return the integer representing the optimal degree for the polynomial regression for the trained data
      * @throws InterruptedException
      */
-    public int getOptimalPolynomialDegreeWithTestData(List<Point> testData) throws InterruptedException {
+    public int getOptimalPolynomialDegreeWithTestData(List<Point> testData, boolean terminalOutput)
+            throws InterruptedException {
 
         long startTime = System.nanoTime();
 
@@ -192,10 +176,6 @@ public class PolynomialRegression {
 
         //creates an even distribution of polynomial degrees so each thread does approximately the same amount of work
         distribute(sequence, threadNum);
-        for (int i : sequence) {
-            System.out.print(i + " ");
-        }
-        System.out.println();
 
         //for every available thread with index: threadIndex
         IntStream.range(0, threadNum).forEach(threadIndex -> {
@@ -209,12 +189,15 @@ public class PolynomialRegression {
 
                     PolynomialRegression regression = new PolynomialRegression(getPoints(), sequence[i]);
                     double error = regression.getTestDataRootMeanSquareError(testData);
-                    System.out.println("Thread: " + threadIndex + ", Degree: " +sequence[i] + ", Error: " + error);
+                    if (terminalOutput) {
+                        System.out.println("Thread: " + threadIndex + ", Degree: " +sequence[i] + ", Error: " + error);
+                    }
                     errorsToDegree.put(error, sequence[i]);
 
                 }
 
-                //for the degree section corresponding to the thread index, compute the minimum error and get its polynomial degree
+                //for the degree section corresponding to the thread index, compute the minimum error and get
+                // its polynomial degree
                 threadRMSE[threadIndex] = Collections.min(errorsToDegree.keySet());
                 threadPolyDegrees[threadIndex] = errorsToDegree.get(threadRMSE[threadIndex]);
 
@@ -236,10 +219,23 @@ public class PolynomialRegression {
         int minimalDegreeIndex = getIndexOfMinDouble(threadRMSE);
 
         long endTime = System.nanoTime();
+        if (terminalOutput) {
+            System.out.println("Time required: " + ((endTime - startTime) / 1000000000.0) + "s");
 
-        System.out.println("Time required: " + ((endTime - startTime) / 1000000000.0) + "s");
+        }
         return threadPolyDegrees[minimalDegreeIndex];
+    }
 
+    /**
+     * Multithreaded implementation of a method based on Root Mean Square Error (RMSE) comparison to obtain the optimal polynomial
+     * degree that minimises the RMSE error, and therefore improves the accuracy of the trained data, given test data.
+     * By default, it prints to terminal the errors, polynomial degrees, the thread ids and the elapsed time.
+     * @param testData the data we want to optimise the regression for
+     * @return the integer representing the optimal degree for the polynomial regression for the trained data
+     * @throws InterruptedException
+     */
+    public int getOptimalPolynomialDegreeWithTestData(List<Point> testData) throws InterruptedException {
+        return getOptimalPolynomialDegreeWithTestData(testData, true);
     }
 
     /**

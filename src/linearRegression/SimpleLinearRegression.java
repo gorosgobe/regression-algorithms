@@ -21,7 +21,7 @@ public class SimpleLinearRegression {
     private double interceptCoefficient;
 
     /**
-     * Constructor of a simple linear regression.
+     * Constructor of a simple linear regression. Coefficients are computed upon creation of the object.
      * @param points the training points
      */
     public SimpleLinearRegression(List<Point> points) {

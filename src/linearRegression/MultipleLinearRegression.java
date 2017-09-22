@@ -7,7 +7,8 @@ import Utils.QRDecomposition;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static polynomialRegression.PolynomialRegression.solveByBackSubstitution;
+import static Utils.QRDecomposition.solveByBackSubstitution;
+
 
 /**
  * Class representing a multiple (two or more independent variables) linear regression.This is of the form
@@ -21,6 +22,10 @@ public class MultipleLinearRegression {
     /** The coefficients to compute*/
     private double[][] coefficients;
 
+    /**
+     * Constructs a MultipleLinearRegression. Coefficients are computed upon creation of the object.
+     * @param points the list containing the points with multiple independent variables and one dependent variable.
+     */
     public MultipleLinearRegression(List<MultiplePoint> points) {
         this.points = points;
         checkAllPointsHaveSameNumberXs();
@@ -79,7 +84,7 @@ public class MultipleLinearRegression {
      * @return the design matrix of the training data supplied in the constructor.
      */
     // Matrix with the x of the points
-    public double[][] generateDesignMatrix() {
+    private double[][] generateDesignMatrix() {
 
         //width is points.get(0).getXs().size() + 1 as column 0 is a column of 1s
         double[][] designMatrix = new double[points.size()][points.get(0).getXs().size() + 1];
@@ -104,7 +109,7 @@ public class MultipleLinearRegression {
      * @return the response matrix with the training data.
      */
     //Matrix with the y of the points
-    public double[][] generateResponseMatrix() {
+    private double[][] generateResponseMatrix() {
         double[][] responseMatrix = new double[points.size()][1];
 
         for (int i = 0; i < responseMatrix.length; i++) {
