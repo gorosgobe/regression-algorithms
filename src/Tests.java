@@ -371,7 +371,7 @@ public class Tests {
 
 
     }
-    
+
     @Test
     public void multipleLinearRegressionTest() throws FileNotFoundException {
         File file = new File("src/testData3.txt");

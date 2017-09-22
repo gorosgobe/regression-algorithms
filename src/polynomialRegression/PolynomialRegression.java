@@ -111,7 +111,7 @@ public class PolynomialRegression {
     /**
      * Computes the coefficients of the polynomial regression and stores them in the <em>coefficients</em> field.
      * */
-    public void computeCoefficients() {
+    private void computeCoefficients() {
         double[][] coefficients;
         double[][] designMatrix = generateDesignMatrix();
         double[][] responseMatrix = generateResponseMatrix();
@@ -135,7 +135,7 @@ public class PolynomialRegression {
      * @param value the value (x) we want to get a prediction for
      * @return the predicted value for the supplied argument according to the trained model
      */
-    private double getPrediction(double value) {
+    public double getPrediction(double value) {
 
         double result = 0.0;
 
@@ -224,6 +224,25 @@ public class PolynomialRegression {
 
         }
         return threadPolyDegrees[minimalDegreeIndex];
+    }
+
+    /**
+     * Returns the optimal polynomial regression (with minimised RMSE) for the supplied training data and test data. Also
+     * prints the errors, poly-degrees and time elapsed in the computation. This also includes the thread ids, as this is
+     * a multithreaded implementation. Bear in mind, however, that this method is computationally intensive should a lot
+     * of testing points be supplied.
+     * @param trainingData the training data for the regression
+     * @param testData the test data to minimise the RMSE error of
+     * @param terminalOutput do you want the thread ids, errors, polynomial degrees and elapsed times to be outputted to
+     *                       the standard output?
+     * @return the optimal Polynomial Regression for the supplied training data and test data
+     * @throws InterruptedException
+     */
+    public PolynomialRegression getOptimalPolynomialRegression(List<Point> trainingData, List<Point> testData,
+                                                               boolean terminalOutput) throws InterruptedException {
+        PolynomialRegression plr = new PolynomialRegression(trainingData, 0);
+        int optimalDegree = getOptimalPolynomialDegreeWithTestData(testData, terminalOutput);
+        return new PolynomialRegression(trainingData, optimalDegree);
     }
 
     /**
