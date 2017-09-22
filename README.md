@@ -91,6 +91,8 @@ Thread: 1, Degree: 32, Error: 825061.6243167162
 Thread: 2, Degree: 36, Error: 1291602.8773571763
 Thread: 3, Degree: 40, Error: 3179747.571711865
 ...
+Thread: 1, Degree: 7, Error: 169.2523672185814
+...
 Thread: 5, Degree: 52, Error: 1.9553379536494124E8
 Thread: 5, Degree: 80, Error: 9.498507018861318E12
 Thread: 6, Degree: 195, Error: 1.1208697729287957E33
