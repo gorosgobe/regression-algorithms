@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import static Utils.QRDecomposition.solveByBackSubstitution;
 import static org.junit.Assert.assertTrue;
 
 
@@ -363,14 +364,14 @@ public class Tests {
                 {4}
         };
 
-        double[][] result = PolynomialRegression.solveByBackSubstitution(R, y);
+        double[][] result = solveByBackSubstitution(R, y);
         Assert.assertTrue(StatisticUtils.isApproxEqual(result[0][0], 9.0));
         Assert.assertTrue(StatisticUtils.isApproxEqual(result[1][0], -1));
         Assert.assertTrue(StatisticUtils.isApproxEqual(result[2][0], -2));
 
 
     }
-
+    
     @Test
     public void multipleLinearRegressionTest() throws FileNotFoundException {
         File file = new File("src/testData3.txt");

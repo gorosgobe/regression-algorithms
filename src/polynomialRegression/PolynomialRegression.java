@@ -384,6 +384,8 @@ public class PolynomialRegression {
     }
 
 
+
+
 //    int count = 0;
 //        for (double i = -2.0; i < 2.0; i += 0.01) {
 //        //assume number of tokens is multiple of 2
