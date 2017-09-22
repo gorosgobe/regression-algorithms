@@ -417,7 +417,7 @@ public class PolynomialRegression {
         System.out.println("Points to analyse: " + testData.size());
 
         PolynomialRegression regression = new PolynomialRegression(points, 0);
-        System.out.println(regression.getOptimalPolynomialDegreeWithTestData(points, testData));
+        System.out.println("Optimal degree:" + getOptimalPolynomialDegreeWithTestData(points, testData));
 
     }
 
