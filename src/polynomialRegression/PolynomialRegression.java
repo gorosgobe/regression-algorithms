@@ -394,7 +394,7 @@ public class PolynomialRegression {
         List<Point> testData = new ArrayList<>();
 
         int count = 0;
-        for (double i = -2.0; i < 2.0; i += 0.01) {
+        for (double i = -2.0; i < 3.0; i += 0.01) {
             //assume number of tokens is multiple of 2
 
             Point point = new Point(i, 0.7483924 * Math.pow(i, 7)
@@ -406,7 +406,7 @@ public class PolynomialRegression {
                     + 0.7483924 * i
                     + Math.random());
 
-            if (count < 205) {
+            if (count < 300) {
                 points.add(point);
             } else {
                 testData.add(point);
@@ -416,8 +416,7 @@ public class PolynomialRegression {
 
         System.out.println("Points to analyse: " + testData.size());
 
-        PolynomialRegression regression = new PolynomialRegression(points, 0);
-        System.out.println("Optimal degree:" + getOptimalPolynomialDegreeWithTestData(points, testData));
+        System.out.println("Optimal degree: " + getOptimalPolynomialDegreeWithTestData(points, testData));
 
     }
 
