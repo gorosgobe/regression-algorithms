@@ -253,7 +253,7 @@ public class PolynomialRegression {
      * @return the integer representing the optimal degree for the polynomial regression for the trained data
      * @throws InterruptedException
      */
-    public int getOptimalPolynomialDegreeWithTestData(List<Point> trainingData, List<Point> testData) throws InterruptedException {
+    public static int getOptimalPolynomialDegreeWithTestData(List<Point> trainingData, List<Point> testData) throws InterruptedException {
         return getOptimalPolynomialDegreeWithTestData(trainingData, testData, true);
     }
 
@@ -269,7 +269,7 @@ public class PolynomialRegression {
      * @return the optimal Polynomial Regression for the supplied training data and test data
      * @throws InterruptedException
      */
-    public PolynomialRegression getOptimalPolynomialRegression(List<Point> trainingData, List<Point> testData,
+    public static PolynomialRegression getOptimalPolynomialRegression(List<Point> trainingData, List<Point> testData,
                                                                boolean terminalOutput) throws InterruptedException {
         PolynomialRegression plr = new PolynomialRegression(trainingData, 0);
         int optimalDegree = getOptimalPolynomialDegreeWithTestData(trainingData, testData, terminalOutput);
