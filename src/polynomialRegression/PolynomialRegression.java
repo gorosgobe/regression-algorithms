@@ -156,6 +156,10 @@ public class PolynomialRegression {
      */
     public double getPrediction(double value) {
 
+        if (coefficients == null) {
+            computeCoefficients();
+        }
+
         double result = 0.0;
 
         for (double i = 0.0; i < coefficients.length; i++) {
@@ -176,6 +180,13 @@ public class PolynomialRegression {
      */
     public static int getOptimalPolynomialDegreeWithTestData(List<Point> trainingData, List<Point> testData, boolean terminalOutput)
             throws InterruptedException {
+        if (trainingData.isEmpty()) {
+            throw new IllegalArgumentException("Empty training data");
+        }
+
+        if (testData.isEmpty()) {
+            throw new IllegalArgumentException("Empty test data");
+        }
 
         long startTime = System.nanoTime();
 
@@ -271,7 +282,6 @@ public class PolynomialRegression {
      */
     public static PolynomialRegression getOptimalPolynomialRegression(List<Point> trainingData, List<Point> testData,
                                                                boolean terminalOutput) throws InterruptedException {
-        PolynomialRegression plr = new PolynomialRegression(trainingData, 0);
         int optimalDegree = getOptimalPolynomialDegreeWithTestData(trainingData, testData, terminalOutput);
         return new PolynomialRegression(trainingData, optimalDegree);
     }
@@ -394,7 +404,7 @@ public class PolynomialRegression {
         List<Point> testData = new ArrayList<>();
 
         int count = 0;
-        for (double i = -2.0; i < 3.0; i += 0.01) {
+        for (double i = -2.0; i < 47.0; i += 0.1) {
             //assume number of tokens is multiple of 2
 
             Point point = new Point(i, 0.7483924 * Math.pow(i, 7)

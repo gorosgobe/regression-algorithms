@@ -431,4 +431,95 @@ public class Tests {
 
     }
 
+    @Test
+    public void polyRegressionOptimalTest() throws InterruptedException {
+        List<Point> points = new ArrayList<>();
+        List<Point> testData = new ArrayList<>();
+
+        int count = 0;
+        for (double i = -2.0; i < 47.0; i += 0.1) {
+            //assume number of tokens is multiple of 2
+
+            Point point = new Point(i, 0.7483924 * Math.pow(i, 7)
+                    + 13.431 * Math.pow(i, 6)
+                    + -12.35161212 * Math.pow(i, 5)
+                    + 0.0000012 * Math.pow(i, 4)
+                    + -9.99991212 * Math.pow(i, 3)
+                    + -34.4300009 * Math.pow(i, 2)
+                    + 0.7483924 * i
+                    + Math.random());
+
+            if (count < 300) {
+                points.add(point);
+            } else {
+                testData.add(point);
+            }
+            count++;
+        }
+        int i = PolynomialRegression.getOptimalPolynomialRegression(points, testData, false).getPolynomialDegree();
+        Assert.assertTrue(i == 7);
+
+
+    }
+
+    @Test
+    public void polyRegressionOptimalTest2() throws InterruptedException {
+        List<Point> points = new ArrayList<>();
+        List<Point> testData = new ArrayList<>();
+
+        int count = 0;
+        for (double i = -2.0; i < 47.0; i += 0.1) {
+            //assume number of tokens is multiple of 2
+
+            Point point = new Point(i, 0.7483924 * Math.pow(i, 8)
+                    + 13.431 * Math.pow(i, 6)
+                    + -12.35161212 * Math.pow(i, 5)
+                    + 0.0000012 * Math.pow(i, 4)
+                    + -9.99991212 * Math.pow(i, 3)
+                    + -34.4300009 * Math.pow(i, 2)
+                    + 0.7483924 * i
+                    + Math.random());
+
+            if (count < 300) {
+                points.add(point);
+            } else {
+                testData.add(point);
+            }
+            count++;
+        }
+        int i = PolynomialRegression.getOptimalPolynomialRegression(points, testData, false).getPolynomialDegree();
+        Assert.assertTrue(i == 8);
+
+
+    }
+
+    @Test
+    public void polyRegressionOptimalTest3() throws InterruptedException {
+        List<Point> points = new ArrayList<>();
+        List<Point> testData = new ArrayList<>();
+
+        int count = 0;
+        for (double i = -2.0; i < 47.0; i += 0.1) {
+            //assume number of tokens is multiple of 2
+
+            Point point = new Point(i,
+                    5.6 * Math.pow(i, 4)
+                    + -9.99991212 * Math.pow(i, 3)
+                    + -34.4300009 * Math.pow(i, 2)
+                    + 0.7483924 * i
+                    + Math.random());
+
+            if (count < 300) {
+                points.add(point);
+            } else {
+                testData.add(point);
+            }
+            count++;
+        }
+        int i = PolynomialRegression.getOptimalPolynomialRegression(points, testData, false).getPolynomialDegree();
+        Assert.assertEquals(4, i);
+
+
+    }
+
 }
